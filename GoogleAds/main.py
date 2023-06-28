@@ -30,9 +30,27 @@ class GoogleAds:
         self.get_cookies()
 
     def get_cookies(self):
-        params = {
-            'region': 'anywhere',
-        }
+        params = {}
+        region = input("Input Region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
+        print('You selected the region:',region)
+
+        while region not in ['0', '1', '2', '3']:
+            region = input("Invalid input. Please select a valid region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
+            print('You selected the region:',region)
+
+        if region == '0':
+            locale = 'anywhere'
+        elif region == '1':
+            locale = 'en_US'
+        elif region == '2':
+            locale = 'es_UY'
+        elif region == '3':
+            locale = 'br_PT'
+        else:
+            print("Region not defined. Please select a valid option.")
+
+        params['region'] = locale
+
         self.reqs.get('https://adstransparency.google.com/', params=params, headers=headers)#.text.replace("\/","")
         #response = str(response[response.find("tfaaReportAppInfo"):]).encode('utf8').decode('unicode_escape')
         #print(json.loads(response[response.find("["):response.find(']')+1]))
