@@ -23,33 +23,43 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
 }
 
+def input_parameters():
+    region = input("Input Region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
+    print('You selected the region:', region)
+
+    while region not in ['0', '1', '2', '3']:
+        region = input("Invalid input. Please select a valid region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
+        print('You selected the region:', region)
+
+    if region == '0':
+        locale = 'anywhere'
+    elif region == '1':
+        locale = 'US'
+    elif region == '2':
+        locale = 'UY'
+    elif region == '3':
+        locale = 'BR'
+    else:
+        print("Region not defined. Please select a valid option.")
+
+    input_keyword = input("\n\nType the Keyword you want to search for ads transparency\n")
+    print('The keyword selected is:', input_keyword)
+
+    return locale  # Return the value of 'locale' from the function
+    
+
 class GoogleAds:
-    def __init__(self,  headers):
+    def __init__(self, headers):
         self.reqs = requests.Session()
         self.headers = headers
         self.get_cookies()
 
     def get_cookies(self):
+        locale = input_parameters()  # Call the input_parameters function and store the returned locale value
+
         params = {}
-        region = input("Input Region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
-        print('You selected the region:',region)
-
-        while region not in ['0', '1', '2', '3']:
-            region = input("Invalid input. Please select a valid region:\n 0 - anywhere\n 1 - en_US\n 2 - es_UY\n 3 - br_PT\n")
-            print('You selected the region:',region)
-
-        if region == '0':
-            locale = 'anywhere'
-        elif region == '1':
-            locale = 'en_US'
-        elif region == '2':
-            locale = 'es_UY'
-        elif region == '3':
-            locale = 'br_PT'
-        else:
-            print("Region not defined. Please select a valid option.")
-
         params['region'] = locale
+
 
         self.reqs.get('https://adstransparency.google.com/', params=params, headers=headers)#.text.replace("\/","")
         #response = str(response[response.find("tfaaReportAppInfo"):]).encode('utf8').decode('unicode_escape')
@@ -200,13 +210,13 @@ class GoogleAds:
 
 if __name__ == '__main__':
     a = GoogleAds(headers)
-    keyword = "ibbedesign"
-    keyword = "facebook"
+    keyword = input_parameters()  # Call input_parameters function and store the returned value in 'keyword'
     creatives = a.get_creative_Ids(keyword)
+
     if creatives["Ad Count"]:
-        advertisor_id = creatives["Advertisor Id"]
+        advertiser_id = creatives["Advertisor Id"]
         for creative_id in creatives["Creative_Ids"]:
-            #print(a.get_breif_ads(advertisor_id, creative_id))
-            print(a.get_detailed_ad(advertisor_id,creative_id))
+            # print(a.get_breif_ads(advertiser_id, creative_id))
+            print(a.get_detailed_ad(advertiser_id, creative_id))
     else:
         print("Got nothing")
