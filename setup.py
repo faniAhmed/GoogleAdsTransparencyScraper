@@ -2,12 +2,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="Google Ads Transparency Scraper",
+    name="GoogleAdsTransparencyScraper",
     author="Farhan Ahmed",
     author_email="jattfarhan10@gmail.com",
     url="https://github.com/faniAhmed/GoogleAdsTransparencyScraper",
-    description="A scraper for getting Ads from Google Transparency",
-    version="1.5",
+    description="A scraper for getting Ads from Google Ads Transparency",
+    version="1.5.1",
     packages=find_packages(),
     download_url= 'https://github.com/faniAhmed/GoogleAdsTransparencyScraper/archive/refs/tags/v1.2.tar.gz',
     keywords= ['Google', 'Transparency', 'Scraper', 'API', 'Google Ads', 'Ads', 'Google Transparency', 'Google Transparency Scraper', 'Google Ads Scrapre'],
