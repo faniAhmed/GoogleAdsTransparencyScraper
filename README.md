@@ -4,11 +4,14 @@ It is a scraper that gets the Creatives/Ads data from Google Ads Transparency. T
 For Donations:
 
 You can send remmitance on the following account.
-Name: Farhan Ahmed
-Bank: Sadapay
-Country: Pakistan
-IBAN: PK29SADA0000003406021417
 
+>Name: Farhan Ahmed
+>
+>Bank: Sadapay
+>
+>Country: Pakistan
+>
+>IBAN: PK29SADA0000003406021417
 ## Installation:
 
 You can install it using pip.
