@@ -32,13 +32,19 @@ def show_regions_list():
         print(f"Region Name: {Regions[region_code]['Region']}\tRegion Code: {region_code}")
 
 class GoogleAds:
-    def __init__(self, region="anywhere"):
+    def __init__(self, region="anywhere", proxy=None):
         self.reqs = requests.Session()
         self.headers = HEADERS
+        #proxy config
+        self.proxy = proxy
+        if proxy is not None:
+            self.reqs.proxies.update(proxy)
+
         self.r_check = True
         if region == "anywhere":
             self.r_check = False
-        if not Regions.get(region) and not self.r_check:
+        print((not Regions.get(region)) and self.r_check)
+        if (not Regions.get(region)) and self.r_check:
             raise Exception("Invalid Region Code")
         self.region = region
         self.region_num = Regions[region]["1"] if self.r_check else 0
@@ -53,10 +59,13 @@ class GoogleAds:
         #response = str(response[response.find("tfaaReportAppInfo"):]).encode('utf8').decode('unicode_escape')
         #print(json.loads(response[response.find("["):response.find(']')+1]))
 
-    def refresh_session(self):
+    def refresh_session(self, proxy=None):
         """Refresh Session cookies"""
         self.reqs = requests.Session()
         self.get_cookies()
+        if proxy is not None:
+            self.proxy = proxy
+        self.reqs.proxies.update(self.proxy)
 
     def get_all_search_suggestions(self, keyword: str) -> list:
         """
@@ -210,7 +219,8 @@ class GoogleAds:
 if __name__ == '__main__':
     a = GoogleAds()
     keyword = "ibbedesign"
-    keyword = "facebook"
+    keyword = "Google"
+    print(a.get_advistisor_by_domain(keyword), end="\n\n")
     creatives = a.get_creative_Ids(keyword)
     if creatives["Ad Count"]:
         advertisor_id = creatives["Advertisor Id"]
