@@ -1,17 +1,14 @@
 # GoogleTransparencyScraper
 
 It is a scraper that gets the Creatives/Ads data from Google Ads Transparency. The public API of Google Transparency have been reverse enginnered to get the desired data.  It has support for search based on specific region and also supports proxies. Any one can contribute to this project by making a pull request or identifying any feature that I should add to it.
-#### For Donations:
+For Donations:
 
 You can send remmitance on the following account.
+Name: Farhan Ahmed
+Bank: Sadapay
+Country: Pakistan
+IBAN: PK29SADA0000003406021417
 
->Name: Farhan Ahmed
->
->Bank: Sadapay
->
->Country: Pakistan
->
->IBAN: PK29SADA0000003406021417
 ## Installation:
 
 You can install it using pip.
@@ -21,7 +18,7 @@ pip install Google-Ads-Transparency-Scraper
 ```
 
 The PyPi link to the module is
-[https://pypi.org/project/Google-Ads-Transparency-Scraper/] (Google Ads Transparency Scraper)
+[https://pypi.org/project/Google-Ads-Transparency-Scraper/](Google Ads Transparency Scraper)
 
 ## Usage:
 
@@ -58,27 +55,35 @@ show_regions_list()
 
 ### GoogleAds():
 
-The class GoogleAds has Region as an Optional parameter.
+The class GoogleAds has Region and proxy as Optional parameters. Proxy will remain same for a single object instance though you can update proxy and cookies using the refresh_session() function (Details are available in the section below). 
 
 ```
-def__init__(self, region="anywhere")
+def__init__(self, region="anywhere", proxy=None)
 ```
 
 The Obj instance can be created as follow
 
 ```
+proxy = { 
+              "http"  : http_proxy, 
+              "https" : https_proxy, 
+              "ftp"   : ftp_proxy
+            }
 Obj1 = GoogleAds()
-Obj2 = GoogleAds("pk")
+Obj2 = GoogleAds(region="pk")
+Obj3 = GoogleAds(proxy=proxy)
+Obj4 = GoogleAds(region="pk", proxy=proxy)
 ```
 
 The followinga are the functions provided in this module
 
 ##### Refresh Session:
 
-It changes cookies and makes a new session with Google. Benificient to call periodically so Google does not block you too early.
-
+It changes cookies and proxies[Optional] making a new session with Google. Benificient to call periodically so Google does not block you.
+The previous region will be continued and proxies will be updated as per given parameters.
 ```
 Obj1.refresh_session()
+Obj1.refresh_session(proxy=proxy)
 ```
 
 ##### Get All Search Suggestion:
