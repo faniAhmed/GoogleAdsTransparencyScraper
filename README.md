@@ -1,12 +1,17 @@
 # GoogleTransparencyScraper
 
 It is a scraper that gets the Creatives/Ads data from Google Ads Transparency. The public API of Google Transparency have been reverse enginnered to get the desired data.  It has support for search based on specific region and also supports proxies. Any one can contribute to this project by making a pull request or identifying any feature that I should add to it.
+
 For Donations:
 
 You can send remmitance on the following account.
+
 Name: Farhan Ahmed
+
 Bank: Sadapay
+
 Country: Pakistan
+
 IBAN: PK29SADA0000003406021417
 
 ## Installation:
