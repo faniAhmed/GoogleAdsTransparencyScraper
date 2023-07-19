@@ -25,7 +25,7 @@ The PyPi link to the module is
 After Installation you can import the module as
 
 ```
-from GoogleAdsTransparency.main import GoogleAds, show_regions_list
+from GoogleAds.main import GoogleAds, show_regions_list
 ```
 
 ###### Example Code:
