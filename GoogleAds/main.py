@@ -2,7 +2,7 @@ import datetime
 import requests
 from typing import Union
 from bs4 import BeautifulSoup as soap
-from regions import Regions
+from .regions import Regions
 
 HEADERS = {
     'authority': 'adstransparency.google.com',
@@ -37,7 +37,7 @@ class GoogleAds:
         self.headers = HEADERS
         #proxy config
         self.proxy = proxy
-        if proxy is not None:
+        if proxy is not None or not proxy:
             self.reqs.proxies.update(proxy)
 
         self.r_check = True
@@ -63,7 +63,7 @@ class GoogleAds:
         """Refresh Session cookies"""
         self.reqs = requests.Session()
         self.get_cookies()
-        if proxy is not None:
+        if proxy is not None or not proxy:
             self.proxy = proxy
         self.reqs.proxies.update(self.proxy)
 
