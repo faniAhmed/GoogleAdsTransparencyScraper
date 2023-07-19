@@ -37,7 +37,7 @@ class GoogleAds:
         self.headers = HEADERS
         #proxy config
         self.proxy = proxy
-        if not proxy:
+        if proxy:
             self.reqs.proxies.update(proxy)
 
         self.r_check = True
@@ -63,7 +63,7 @@ class GoogleAds:
         """Refresh Session cookies"""
         self.reqs = requests.Session()
         self.get_cookies()
-        if not proxy:
+        if proxy:
             self.proxy = proxy
         self.reqs.proxies.update(self.proxy)
 
