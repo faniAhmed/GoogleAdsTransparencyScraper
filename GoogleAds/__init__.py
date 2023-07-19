@@ -1,1 +1,1 @@
-from GoogleAdsTransparency.main import GoogleAds, show_regions_list
+from GoogleAds.main import GoogleAds, show_regions_list
