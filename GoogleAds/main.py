@@ -2,7 +2,7 @@ import datetime
 import requests
 from typing import Union
 from bs4 import BeautifulSoup as soap
-from .regions import Regions
+from GoogleAds.regions import Regions
 
 HEADERS = {
     'authority': 'adstransparency.google.com',
