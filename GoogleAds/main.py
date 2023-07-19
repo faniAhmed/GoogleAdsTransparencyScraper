@@ -80,7 +80,7 @@ class GoogleAds:
             params={'authuser': '0'},
             data=data,
         )
-        return suggestions if (suggestions := response.json()["1"]) else []
+        return suggestions if (suggestions := response.json().get("1")) else []
 
     def get_first_search_suggestion(self, keyword: str) -> Union[dict,None]:
         """
@@ -107,7 +107,6 @@ class GoogleAds:
         if response := response.json().get("1"):
             ad = response[0]
             return {"Advertisor Id": ad["1"], "Name":ad["12"]}
-        return None
         #if ads := response.json().get("1"):
         #    with open("new.json", "w") as f:
         #        json.dump(ads, f)
