@@ -1,3 +1,4 @@
+import json
 import datetime
 import requests
 from typing import Union
@@ -45,7 +46,7 @@ class GoogleAds:
             self.r_check = False
         print((not Regions.get(region)) and self.r_check)
         if (not Regions.get(region)) and self.r_check:
-            raise Exception("Invalid Region Code")
+            raise ValueError(f"Region: {region} is not supported, Please call the show_region_list() function to get supported regions list")
         self.region = region
         self.region_num = Regions[region]["1"] if self.r_check else 0
         self.get_cookies()
@@ -113,40 +114,74 @@ class GoogleAds:
         #    return [{"Advertisor Id": ad[1],"Creative Id":ad["2"]} for ad in ads]
         #return []
 
-    def creative_search_by_advertiser_id(self, advertiser_id: str) -> list:    #TODO do region search
-        """Get Creatives or ads by quering given Advertisor Id
-        If no Ad found return []"""
+    def creative_search_by_advertiser_id(self, advertiser_id: str, count: int=40, next_page_id: str="") -> list:    #TODO do region search
+        """Get Creatives or ads by querying given Advertiser Id.
+        If no Ad is found, return an empty list.
+
+        Args:
+            self: The instance of the class.
+            advertiser_id (str): The ID of the advertiser.
+
+        Returns:
+            list: A list of creatives or ads."""
+
         data = {
-            'f.req': '{"2":40,"3":{"12":{"1":"","2":true},"13":{"1":["' + advertiser_id + '"]}}, "7":{"1":1}}',
+            'f.req': {
+                "2": min(count, 100),
+                "3": {"12": {"1": "", "2": True}, "13": {"1": [advertiser_id]}},
+                "7": {"1": 1},
+            }
         }
+        if next_page_id:
+            data['f.req']["4"] = next_page_id
         if self.r_check:
-            data = {
-            'f.req': '{"2":40,"3":{"8":[' + str(self.region_num) + '],"12":{"1":"","2":true},"13":{"1":["' + advertiser_id + '"]}}, "7":{"1":1}}',
-        }
+            data['f.req']["3"]["8"] = [self.region_num]
+
+        data['f.req'] = json.dumps(data['f.req'])
+
+
         response = self.reqs.post(
             'https://adstransparency.google.com/anji/_/rpc/SearchService/SearchCreatives',
             params={'authuser': ''},
             data=data,
         )
-        return [ad["2"] for ad in ads] if (ads := response.json().get("1")) else []
 
-    def get_creative_Ids(self, keyword: str) -> dict:
+        res = response.json()
+        ads = res.get("1", [])
+        ads = [ad["2"] for ad in ads]
+        next_page_id = res.get("2")
+        if count <= 100 or not ads or next_page_id is None:
+            return ads[:count]
+        count -= len(ads)
+        ads.extend(self.creative_search_by_advertiser_id(advertiser_id, count, next_page_id))
+        return ads
+
+    def get_creative_Ids(self, keyword: str, count: int =40) -> dict:
         """Makes search for given keyword and gets the first Suggestion. Then gets the Creatives for that.
         Returns Advertisor Name, Id, Ad count and List of Creatives"""
-        if not (search := self.get_first_search_suggestion(keyword)):
-            return {"Advertisor": "", "Advertisor Id":"", "Ad Count": 0, "Creatives": []}
-        print(search)
+        search = self.get_first_search_suggestion(keyword)
+        if not search:
+            return {"Advertisor": "", "Advertisor Id": "", "Ad Count": 0, "Creative_Ids": []}
 
-        if search.get("2"): 
-            if not (advertisor := self.get_advistisor_by_domain(domain=search["2"]["1"])):
-                return {"Advertisor": "", "Advertisor Id":"", "Ad Count": 0, "Creatives": []}
+        if search.get("2"):
+            domain = search["2"]["1"]
+            advertisor = self.get_advistisor_by_domain(domain=domain)
+            if not advertisor:
+                return {"Advertisor": "", "Advertisor Id": "", "Ad Count": 0, "Creative_Ids": []}
             suggestions = self.get_all_search_suggestions(advertisor["Name"])
             search = next((suggestion for suggestion in suggestions if suggestion["1"]["1"] == advertisor["Name"] and suggestion["1"]["2"] == advertisor["Advertisor Id"]), None)
+
         advertisor = search["1"]["1"]
-        Ad_count = search['1']['4']['2']['2'] if search["1"].get("4") else 0
-        if Ad_count:
-            return {"Advertisor": advertisor, "Advertisor Id": search["1"]["2"], "Ad Count": Ad_count, "Creative_Ids": self.creative_search_by_advertiser_id(advertiser_id=search["1"]["2"])}
-        return {"Advertisor": advertisor, "Advertisor Id":search["1"]["2"], "Ad Count": Ad_count, "Creative_Ids": []}
+        advertiser_id = search["1"]["2"]
+        ad_count = search['1']['4']['2']['2'] if search["1"].get("4") else 0
+
+        if ad_count:
+            creative_ids = self.creative_search_by_advertiser_id(advertiser_id, count)
+        else:
+            creative_ids = []
+
+        return {"Advertisor": advertisor, "Advertisor Id": advertiser_id, "Ad Count": ad_count, "Creative_Ids": creative_ids}
+
 
     def get_link_to_video(self, link: str) -> str:
         """Get the JS response from the link given and parse the Video/Image Link. Returns input Link if any error occurs"""
@@ -203,9 +238,11 @@ class GoogleAds:
     def get_detailed_ad(self, advertisor_id: str, creative_id: str) -> dict:
         """Takes the Advertisor Id and Creative ID and returns the details of that particular Ad"""
         ad_detail = self.get_breif_ads(advertisor_id, creative_id)
-        response = self.reqs.get(
-            ad_detail["Ad Link"],
-        )
+        try:
+            response = self.reqs.get(ad_detail["Ad Link"])
+        except Exception:
+            response = "<html></html>"
+            ad_detail["Ad Link"] = "" # TODO check schema: False => add schema, check link: False => link = "" 
         ad_detail.update({"Ad Body":"", "Ad Title": "", "Image URL": "", "Video URL": ""})
         if ad_detail["Ad Format"] == "Text":
             ad_detail.update(self.parse_ad_link(response.text))
@@ -218,9 +255,12 @@ class GoogleAds:
 if __name__ == '__main__':
     a = GoogleAds()
     keyword = "ibbedesign"
-    keyword = "Google"
-    print(a.get_advistisor_by_domain(keyword), end="\n\n")
-    creatives = a.get_creative_Ids(keyword)
+    keyword = "Google LLC"
+    #print(a.get_detailed_ad('AR05099026886533578753',"CR06021040984983339009"))
+    #exit(0)
+    #print(a.get_advistisor_by_domain(keyword), end="\n\n")
+    creatives = a.get_creative_Ids(keyword, 1000)
+    print(len(creatives["Creative_Ids"]))
     if creatives["Ad Count"]:
         advertisor_id = creatives["Advertisor Id"]
         for creative_id in creatives["Creative_Ids"]:
