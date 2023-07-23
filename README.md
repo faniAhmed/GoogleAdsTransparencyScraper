@@ -32,8 +32,8 @@ from GoogleAds.main import GoogleAds, show_regions_list
 
 ```
     a = GoogleAds()
-    keyword = "Google"
-    creatives = a.get_creative_Ids(keyword)
+    keyword = "Google LLC"
+    creatives = a.get_creative_Ids(keyword, 200) # Get 200 creatives if available
     if creatives["Ad Count"]:
         advertisor_id = creatives["Advertisor Id"]
         for creative_id in creatives["Creative_Ids"]:
@@ -141,7 +141,7 @@ Makes search of domain/url and returns the Company Name and It's Advertisor Id. 
 > {'Advertisor Id': 'AR14188379519798214657', 'Name': 'Google LLC'}
 
 ##### Get Creative Ids:
-
+Takes a keyword and a count argument. The count argument tells the number of creatives that need to be extracted
 Makes search for given keyword and gets the first Suggestion. Then gets the Creatives for that.
 
 Returns Advertisor Name, Id, Ad count and List of Creatives
@@ -153,7 +153,7 @@ The following is the return format
 You call this method as follow
 
 ```
-Obj1.get_creative_Ids("Keyword")
+Obj1.get_creative_Ids("Keyword", 200) # count is 40 by default
 ```
 
 ##### Get Creatives by Advertisor Id:
@@ -161,7 +161,7 @@ Obj1.get_creative_Ids("Keyword")
 Get list of Creative Ids for given Advertisor Id
 
 ```
-Obj1.creative_search_by_advertiser_id("Advertisor Id")
+Obj1.creative_search_by_advertiser_id("Advertisor Id", 200) # count is 40 by default
 ```
 
 ##### Get Brief Ad Info:
